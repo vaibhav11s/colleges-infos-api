@@ -18,7 +18,6 @@ export default class CollegesDAO {
         `Unable to establish a collection handle in collegesDAO: ${e}`
       );
     }
-    console.log(colleges);
   }
 
   static async getColleges({
