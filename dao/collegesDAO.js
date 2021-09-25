@@ -7,7 +7,6 @@ let collectionName = CollectionNames["db0"];
 
 export default class CollegesDAO {
   static async injectDB(conn) {
-    console.log("inject", conn);
     if (colleges) {
       return;
     }
