@@ -32,8 +32,8 @@ export default class StudentsDAO {
       } else if ("state" in filters) {
         query["state"] = { $eq: filters["state"] };
       }
-      if ("collegeId" in filters) {
-        query["college_Id"] = { $eq: filters["collegeId"] };
+      if ("college_Id" in filters) {
+        query["college_Id"] = { $eq: parseInt(filters["college_Id"], 10) };
       }
       if ("enrolled_course" in filters) {
         query["enrolled_course"] = { $eq: filters["enrolled_course"] };

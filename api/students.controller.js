@@ -13,8 +13,8 @@ export default class StudentsController {
     } else if (req.query.state) {
       filters.state = req.query.state;
     }
-    if (req.query.collegeId) {
-      filters.collegeId = req.query.collegeId;
+    if (req.query.college_Id) {
+      filters.college_Id = req.query.college_Id;
     }
     if (req.query.enrolled_course) {
       filters.enrolled_course = req.query.enrolled_course;
