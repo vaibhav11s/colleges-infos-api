@@ -32,6 +32,9 @@ export default class StudentsDAO {
       } else if ("state" in filters) {
         query["state"] = { $eq: filters["state"] };
       }
+      if ("collegeId" in filters) {
+        query["college_Id"] = { $eq: filters["collegeId"] };
+      }
       if ("enrolled_course" in filters) {
         query["enrolled_course"] = { $eq: filters["enrolled_course"] };
       }
@@ -107,6 +110,74 @@ export default class StudentsDAO {
       return await students.aggregate(pipeline).next();
     } catch (e) {
       console.error(`Something went wrong in getStudentByID: ${e}`);
+      throw e;
+    }
+  }
+
+  static async getStats({ college_Id = null }) {
+    try {
+      let pipeline;
+      let res;
+      const stats = {};
+
+      if (college_Id) {
+        college_Id = parseInt(college_Id, 10);
+        pipeline = [{ $match: { college_Id: college_Id } }];
+        if ((collectionName = CollectionNames["db0"])) {
+          pipeline = [
+            { $match: { college_Id: college_Id } },
+            { $group: { _id: "$enrolled_course", total: { $sum: 1 } } },
+          ];
+          res = await students.aggregate(pipeline);
+          stats["courses"] = await res.toArray();
+        }
+
+        pipeline = [
+          { $match: { college_Id: college_Id } },
+          { $unwind: "$skills" },
+          { $group: { _id: "$skills", total: { $sum: 1 } } },
+        ];
+        res = await students.aggregate(pipeline);
+        stats["skills"] = await res.toArray();
+
+        pipeline = [
+          { $match: { college_Id: college_Id } },
+          { $group: { _id: "$state", total: { $sum: 1 } } },
+        ];
+        res = await students.aggregate(pipeline);
+        stats["state"] = await res.toArray();
+
+        pipeline = [
+          { $match: { college_Id: college_Id } },
+          { $group: { _id: "$city", total: { $sum: 1 } } },
+        ];
+        res = await students.aggregate(pipeline);
+        stats["city"] = await res.toArray();
+      } else {
+        pipeline = [
+          { $group: { _id: "$enrolled_course", total: { $sum: 1 } } },
+        ];
+        res = await students.aggregate(pipeline);
+        stats["courses"] = await res.toArray();
+
+        pipeline = [
+          { $unwind: "$skills" },
+          { $group: { _id: "$skills", total: { $sum: 1 } } },
+        ];
+        res = await students.aggregate(pipeline);
+        stats["skills"] = await res.toArray();
+
+        pipeline = [{ $group: { _id: "$state", total: { $sum: 1 } } }];
+        res = await students.aggregate(pipeline);
+        stats["state"] = await res.toArray();
+
+        pipeline = [{ $group: { _id: "$city", total: { $sum: 1 } } }];
+        res = await students.aggregate(pipeline);
+        stats["city"] = await res.toArray();
+      }
+      return stats;
+    } catch (e) {
+      console.error(`Something went wrong in getStats: ${e}`);
       throw e;
     }
   }

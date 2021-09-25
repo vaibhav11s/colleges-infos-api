@@ -13,6 +13,9 @@ export default class StudentsController {
     } else if (req.query.state) {
       filters.state = req.query.state;
     }
+    if (req.query.collegeId) {
+      filters.collegeId = req.query.collegeId;
+    }
     if (req.query.enrolled_course) {
       filters.enrolled_course = req.query.enrolled_course;
     }
@@ -50,6 +53,17 @@ export default class StudentsController {
       res.json(student);
     } catch (e) {
       console.log(`api, ${e}`);
+      res.status(500).json({ error: e });
+    }
+  }
+
+  static async apiGetStats(req, res, next) {
+    try {
+      let college_Id = req.query.college_Id;
+      let stats = await StudentsDAO.getStats({ college_Id });
+      res.json(stats);
+    } catch (e) {
+      console.log(`api,${e}`);
       res.status(500).json({ error: e });
     }
   }

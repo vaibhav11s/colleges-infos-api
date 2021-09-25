@@ -162,6 +162,16 @@ export default class CollegesController {
     }
   }
 
+  static async apiGetStats(req, res, next) {
+    try {
+      let stats = await CollegesDAO.getStats();
+      res.json(stats);
+    } catch (e) {
+      console.log(`api,${e}`);
+      res.status(500).json({ error: e });
+    }
+  }
+
   static async apiGetCourses(req, res, next) {
     try {
       let courses = await CollegesDAO.getCourses();

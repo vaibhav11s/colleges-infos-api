@@ -86,6 +86,39 @@ export default class CollegesDAO {
     }
   }
 
+  static async getStats() {
+    try {
+      let pipeline;
+      const stats = {};
+      let res;
+
+      pipeline = [{ $group: { _id: "$state", total: { $sum: 1 } } }];
+      res = await colleges.aggregate(pipeline);
+      stats["states"] = await res.toArray();
+
+      pipeline = [{ $group: { _id: "$city", total: { $sum: 1 } } }];
+      res = await colleges.aggregate(pipeline);
+      stats["cities"] = await res.toArray();
+
+      if (collectionName === CollectionNames["db0"]) {
+        pipeline = [
+          { $unwind: "$courses" },
+          { $group: { _id: "$courses", total: { $sum: 1 } } },
+        ];
+      }
+      if (collectionName === CollectionNames["db1"]) {
+        pipeline = [{ $group: { _id: "$course", total: { $sum: 1 } } }];
+      }
+      res = await colleges.aggregate(pipeline);
+      stats["courses"] = await res.toArray();
+
+      return stats;
+    } catch (e) {
+      console.error(`Something went wrong in getRestaurantByID: ${e}`);
+      throw e;
+    }
+  }
+
   static async getCollegeByID(id, withStudents = false) {
     try {
       let pipeline = [];
@@ -126,7 +159,7 @@ export default class CollegesDAO {
       }
       return await colleges.aggregate(pipeline).next();
     } catch (e) {
-      console.error(`Something went wrong in getRestaurantByID: ${e}`);
+      console.error(`Something went wrong in getCollegeByID: ${e}`);
       throw e;
     }
   }
