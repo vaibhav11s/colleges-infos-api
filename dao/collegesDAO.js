@@ -186,10 +186,25 @@ export default class CollegesDAO {
     }
   }
 
-  static async getCities() {
+  static async getCities({ state = null }) {
     let cities = [];
     try {
-      cities = await colleges.distinct("city");
+      let res;
+      if (!state) {
+        res = await colleges.distinct("city");
+        cities = res.map((city) => ({ _id: city }));
+      } else {
+        let pipeline = [
+          {
+            $match: {
+              state: state,
+            },
+          },
+          { $group: { _id: "$city" } },
+        ];
+        res = await colleges.aggregate(pipeline);
+        cities = res.toArray();
+      }
       return cities;
     } catch (e) {
       console.error(`Unable to get cities ${e}`);

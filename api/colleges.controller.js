@@ -194,7 +194,8 @@ export default class CollegesController {
 
   static async apiGetCities(req, res, next) {
     try {
-      let cities = await CollegesDAO.getCities();
+      let state = req.query.state;
+      let cities = await CollegesDAO.getCities({ state });
       res.json(cities);
     } catch (e) {
       console.log(`api,${e}`);
